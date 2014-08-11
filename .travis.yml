@@ -1,0 +1,18 @@
+language: objective-c
+
+env:
+ global:
+  - EnableNuGetPackageRestore=true 
+ matrix:
+  - MONO_VERSION="3.4.0"
+
+before_install:
+ - wget "http://download.mono-project.com/archive/${MONO_VERSION}/macos-10-x86/MonoFramework-MDK-${MONO_VERSION}.macos10.xamarin.x86.pkg"
+ - sudo installer -pkg "MonoFramework-MDK-${MONO_VERSION}.macos10.xamarin.x86.pkg" -target /
+ 
+script:
+  - mono --runtime=v4.0 .ci/NuGet.exe restore src/Salesforce.Force.sln -ConfigFile NuGet.Config -Source nuget -Verbosity detailed -NoCache -DisableParallelProcessing
+  - xbuild src/Salesforce.Force.sln
+  - mono --runtime=v4.0 .ci/NuGet.exe install NUnit.Runners -Version 2.6.3 -o packages
+  - mono --runtime=v4.0 packages/NUnit.Runners.2.6.3/tools/nunit-console.exe -noxml -nodots -labels -stoponerror src/Salesforce.Force.FunctionalTests/bin/Debug/Salesforce.Force.FunctionalTests.dll
+  - mono --runtime=v4.0 packages/NUnit.Runners.2.6.3/tools/nunit-console.exe -noxml -nodots -labels -stoponerror src/Salesforce.Force.UnitTests/bin/Debug/Salesforce.Force.UnitTests.dll
