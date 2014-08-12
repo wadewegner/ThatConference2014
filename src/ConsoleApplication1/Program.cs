@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Salesforce.Force;
 
-namespace Salesforce.Force.FunctionalTests
+namespace ConsoleApplication1
 {
-
-    [TestFixture]
-    public class Tests
+    class Program
     {
         private static string _securityToken = Encoding.UTF8.GetString(Convert.FromBase64String("V1dnVGFiSEdETE5wV29SbERaYkpJOElyOQ=="));
         private static string _clientId = Encoding.UTF8.GetString(Convert.FromBase64String("M01WRzl4T0NYcTRJRDF1RUNwckh3OXlBMmVqbGE2OGI1MDk2a2hPQnFLZXdDeHVXZjNPOEJOYWc1eW0ycXJPTGxkQ2xQOFNwVTVwLkRhUmtRa19BQw=="));
@@ -17,25 +15,16 @@ namespace Salesforce.Force.FunctionalTests
         private static string _username = "demo@appplat.com";
         private static string _password = Encoding.UTF8.GetString(Convert.FromBase64String("UGEkJHcwcmQh")) + _securityToken;
 
-        [Test]
-        public async Task Auth_UsernamePassword_HasToken()
+        static void Main(string[] args)
         {
             var auth = new AuthenticationClient();
-            await auth.UsernamePasswordAsync(_clientId, _clientSecret, _username, _password);
-
-            Assert.IsNotNull(auth.AccessToken);
-        }
-
-        [Test]
-        public async Task Query_Accounts_IsNotNull()
-        {
-            var auth = new AuthenticationClient();
-            await auth.UsernamePasswordAsync(_clientId, _clientSecret, _username, _password);
+            auth.UsernamePasswordAsync(_clientId, _clientSecret, _username, _password).Wait();
 
             var client = new ForceClient(auth.InstanceUrl, auth.AccessToken, auth.ApiVersion);
-            var results = await client.QueryAsync<dynamic>("SELECT Id, Name, Description FROM Account");
+            var results =  client.QueryAsync<dynamic>("SELECT Id, Name, Description FROM Account");
+            results.Wait();
 
-            Assert.IsNotNull(results.records);
+            Console.WriteLine(results.Result.records.Count);
         }
     }
 }
