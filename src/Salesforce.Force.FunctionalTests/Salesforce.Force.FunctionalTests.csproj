@@ -50,7 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Salesforce.Force\Salesforce.Force.csproj">
+    <ProjectReference Include="..\Salesforce.Force\Salesforce.Force.csproj">
       <Project>{9319db92-4429-4d25-b2f0-e2f42df07c79}</Project>
       <Name>Salesforce.Force</Name>
     </ProjectReference>
